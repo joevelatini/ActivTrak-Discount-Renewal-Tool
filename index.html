@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActivTrak Combined Tool</title>
+    <style>
+        :root {
+            --primary-color: #2a74e3;
+            --secondary-color: #172755;
+            --light-bg: #f5f5f5;
+            --border-color: #ddd;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            position: relative;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .logo-text {
+            margin-left: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        h1, h2, h3 {
+            color: var(--secondary-color);
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #666;
+            transition: background-color 0.3s;
+        }
+        
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Form Elements */
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+        
+        input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: left;
+            padding: 10px;
+        }
+        
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+        
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        /* Summary Boxes */
+        .summary {
+            background-color: #e9f0f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .summary-box {
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .summary-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .summary-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Quote View */
+        #quoteView {
+            display: none;
+        }
+        
+        .pricing-cards {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .pricing-card {
+            flex: 1;
+            min-width: 250px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .pricing-card.highlight {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        
+        .settings-panel {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .manual-adjust {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        /* Step indicator */
+        .steps {
+            display: flex;
+            margin-bottom: 30px;
+            overflow: auto;
+        }
+        
+        .step {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            position: relative;
+            margin-right: 20px;
+            white-space: nowrap;
+        }
+        
+        .step::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 0;
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+            border-left: 10px solid #f0f0f0;
+        }
+        
+        .step.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .step.active::after {
+            border-left-color: var(--primary-color);
+        }
+        
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            body {
+                background-color: white;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo">
+            <div class="logo-icon">
+                <div style="position: absolute; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 35px solid #172755;"></div>
+                <div style="position: absolute; left: 5px; top: 5px; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 25px solid #2a74e3;"></div>
+            </div>
+            <div class="logo-text">ActivTrak</div>
+        </div>
+        
+        <h1>ActivTrak Discount & Renewal Tool</h1>
+        
+        <!-- Step Indicator -->
+        <div class="steps no-print">
+            <div class="step active" id="step1">1. Client Information</div>
+            <div class="step" id="step2">2. Configure Products</div>
+            <div class="step" id="step3">3. Apply Discounts</div>
+            <div class="step" id="step4">4. Generate Renewal Options</div>
+        </div>
+
+        <!-- Main Application Container -->
+        <div id="appContainer">
+            <!-- Step 1: Client Information -->
+            <div class="step-content active" id="step1Content">
+                <h2>Client Information</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientName">Client Name</label>
+                        <input type="text" id="clientName">
+                    </div>
+                    <div class="form-group">
+                        <label for="accountManager">Account Manager</label>
+                        <input type="text" id="accountManager">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contractMonths">Current Contract Length (Months)</label>
+                        <input type="number" id="contractMonths" value="12" min="1" max="60">
+                    </div>
+                    <div class="form-group">
+                        <label for="currentContract">Current Contract Amount ($)</label>
+                        <input type="number" id="currentContract" value="10000">
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-primary" id="nextToStep2">Next: Configure Products</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Configure Products -->
+            <div class="step-content" id="step2Content">
+                <h2>Configure Products</h2>
+                <div class="settings-panel">
+                    <button id="add-product" class="btn-success">Add Product</button>
+                    <button id="reset-products" class="btn-danger">Reset Products</button>
+                </div>
+                <table id="products-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th class="text-right">Quantity</th>
+                            <th class="text-right">List Price ($)</th>
+                            <th class="text-right">Total List Value ($)</th>
+                            <th class="text-right">Discount (%)</th>
+                            <th class="text-right">Sales Price ($)</th>
+                            <th class="text-right">Total Sales Value ($)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="product-rows">
+                        <!-- Product rows will be added here by JavaScript -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2">Totals</td>
+                            <td class="text-right"><span id="list-price-sum">0.00</span></td>
+                            <td class="text-right"><span id="total-list-value">0.00</span></td>
+                            <td class="text-right"><span id="overall-discount">0.00%</span></td>
+                            <td class="text-right">
+                                <input type="number" id="sales-price-sum" min="0" step="0.01" value="0.00">
+                            </td>
+                            <td class="text-right"><span id="total-sales-value">0.00</span></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="summary">
+                    <div class="summary-grid">
+                        <div class="summary-box">
+                            <div class="summary-label">Monthly List Value</div>
+                            <div class="summary-value" id="monthly-list-value">$0.00</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-label">Monthly Sales Value</div>
+                            <div class="summary-value" id="monthly-sales-value">$0.00</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-label">Monthly Savings</div>
+                            <div class="summary-value" id="monthly-savings">$0.00</div>
+                            <div id="monthly-discount">0.00% discount</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-label">Total Contract List Value</div>
+                            <div class="summary-value" id="contract-list-value">$0.00</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-label">Total Contract Sales Value</div>
+                            <div class="summary-value" id="contract-sales-value">$0.00</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-label">Total Contract Savings</div>
+                            <div class="summary-value" id="contract-savings">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-secondary" id="backToStep1">Back</button>
+                    <button class="btn-primary" id="nextToStep3">Next: Apply Discounts</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Apply Discounts -->
+            <div class="step-content" id="step3Content">
+                <h2>Apply Discounts</h2>
+                <div class="settings-panel">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="target-discount">Target Discount (%)</label>
+                            <input type="number" id="target-discount" min="0" max="99.99" step="0.01" value="30">
+                        </div>
+                        <div class="form-group">
+                            <label for="distribution-method">Distribution Method</label>
+                            <select id="distribution-method">
+                                <option value="proportional">Proportional</option>
+                                <option value="priority">Priority (Highest First)</option>
+                                <option value="equal">Equal</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button id="apply-target-discount" class="btn-primary">Apply Target Discount</button>
+                    </div>
+                </div>
+                <label class="manual-adjust checkbox-label">
+                    <input type="checkbox" id="manualAdjustment">
+                    <span>Enable manual price adjustments</span>
+                </label>
+                <div class="summary">
+                    <h3>Discount Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-box">
+                            <div class="summary-label">Original List Value</div>
+                            <div class="summary-value" id="summary-list-value">$0.00</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-label">Discounted Sales Value</div>
+                            <div class="summary-value" id="summary-sales-value">$0.00</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-label">Total Savings</div>
+                            <div class="summary-value" id="summary-savings">$0.00</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-label">Effective Discount</div>
+                            <div class="summary-value" id="summary-discount">0.00%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-secondary" id="backToStep2">Back</button>
+                    <button class="btn-primary" id="nextToStep4">Next: Generate Renewal Options</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Generate Renewal Options -->
+            <div class="step-content" id="step4Content">
+                <h2>Renewal Options</h2>
+                <div class="settings-panel">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="current-discount">Current Discount (%)</label>
+                            <input type="number" id="current-discount" value="25">
+                        </div>
+                        <div class="form-group">
+                            <label for="renewal-increase">Applied Increase (%)</label>
+                            <input type="number" id="renewal-increase" value="15" disabled>
+                        </div>
+                    </div>
+                    <label class="manual-adjust checkbox-label">
+                        <input type="checkbox" id="manualRenewalAdjustment">
+                        <span>Enable manual renewal price adjustments</span>
+                    </label>
+                </div>
+                <div class="summary">
+                    <p><strong>Contract Information:</strong></p>
+                    <p><strong>Current Contract Value:</strong> <span id="summaryCurrentAmount">$0.00</span></p>
+                    <p><strong>New Contract Base Value:</strong> <span id="summaryNewAmount">$0.00</span></p>
+                    <p><strong>Applied Increase:</strong> <span id="summaryIncrease">15</span>%</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Contract Term</th>
+                            <th class="text-right">Total Price</th>
+                            <th class="text-right">Annual Price</th>
+                            <th class="text-right">Savings vs. Current</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>12 Months</td>
+                            <td class="text-right" id="term12Cell">$0.00</td>
+                            <td class="text-right" id="term12Annual">$0.00</td>
+                            <td class="text-right" id="term12Savings">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>24 Months</td>
+                            <td class="text-right" id="term24Cell">$0.00</td>
+                            <td class="text-right" id="term24Annual">$0.00</td>
+                            <td class="text-right" id="term24Savings">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>36 Months</td>
+                            <td class="text-right" id="term36Cell">$0.00</td>
+                            <td class="text-right" id="term36Annual">$0.00</td>
+                            <td class="text-right" id="term36Savings">$0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="button-group">
+                    <button class="btn-secondary" id="backToStep3">Back</button>
+                    <button id="viewQuoteBtn" class="btn-primary">View Client-Ready Quote</button>
+                    <button id="resetBtn" class="btn-danger">Reset Form</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Client Quote View -->
+        <div id="quoteView">
+            <div class="logo">
+                <div class="logo-icon">
+                    <div style="position: absolute; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 35px solid #172755;"></div>
+                    <div style="position: absolute; left: 5px; top: 5px; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 25px solid #2a74e3;"></div>
+                </div>
+                <div class="logo-text">ActivTrak</div>
+            </div>
+            
+            <h1 style="text-align: center;">ActivTrak Renewal Options</h1>
+            
+            <div id="clientInfo" style="border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin-bottom: 20px;">
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="padding: 5px; font-weight: bold;">Client:</td>
+                        <td id="clientNameDisplay" style="padding: 5px;">-</td>
+                        <td style="padding: 5px; font-weight: bold;">Account Manager:</td>
+                        <td id="accountManagerDisplay" style="padding: 5px;">-</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="pricing-cards">
+                <!-- 12-Month Option -->
+                <div class="pricing-card">
+                    <h3>12 Months</h3>
+                    <div class="price" id="quote12Price">$0.00</div>
+                    <p id="quote12Annual">$0.00 per year</p>
+                    <p style="font-size: 14px; color: #666; margin-top: 15px;">Standard pricing</p>
+                </div>
+                
+                <!-- 24-Month Option -->
+                <div class="pricing-card highlight">
+                    <h3>24 Months</h3>
+                    <div class="price" id="quote24Price">$0.00</div>
+                    <p id="quote24Annual">$0.00 per year</p>
+                    <p style="font-size: 14px; color: #666; margin-top: 15px;">Lock in this rate for 2 years</p>
+                </div>
+                
+                <!-- 36-Month Option -->
+                <div class="pricing-card">
+                    <h3>36 Months</h3>
+                    <div class="price" id="quote36Price">$0.00</div>
+                    <p id="quote36Annual">$0.00 per year</p>
+                    <p style="font-size: 14px; color: #666; margin-top: 15px;">Best value for long-term partnership</p>
+                </div>
+            </div>
+            
+            <!-- Added pricing note below the pricing cards -->
+            <div style="text-align: center; margin-top: 20px; font-style: italic; color: #666;">
+                <p>*Pricing does not include expansion or additional offerings</p>
+            </div>
+            
+            <div style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;">
+                <p style="font-size: 14px;">
+                    For questions or customizations, please contact <span id="contactPerson">your Customer Success Manager</span>.
+                </p>
+                <div class="button-group no-print">
+                    <button id="printBtn" class="btn-secondary">Print Quote</button>
+                    <button id="backBtn" class="btn-primary">Back to Quote Generator</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let products = [];
+        let nextId = 1;
+        let contractMonths = 12;
+        let targetDiscount = 30;
+        let term12Price = 0;
+        let term24Price = 0;
+        let term36Price = 0;
+
+        // DOM Elements for steps
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        
+        const step1Content = document.getElementById('step1Content');
+        const step2Content = document.getElementById('step2Content');
+        const step3Content = document.getElementById('step3Content');
+        const step4Content = document.getElementById('step4Content');
+        
+        // Step navigation buttons
+        const nextToStep2 = document.getElementById('nextToStep2');
+        const backToStep1 = document.getElementById('backToStep1');
+        const nextToStep3 = document.getElementById('nextToStep3');
+        const backToStep2 = document.getElementById('backToStep2');
+        const nextToStep4 = document.getElementById('nextToStep4');
+        const backToStep3 = document.getElementById('backToStep3');
+        
+        // Discount calculator elements
+        const addProductBtn = document.getElementById('add-product');
+        const resetProductsBtn = document.getElementById('reset-products');
+        const targetDiscountInput = document.getElementById('target-discount');
+        const distributionMethodSelect = document.getElementById('distribution-method');
+        const applyTargetDiscountBtn = document.getElementById('apply-target-discount');
+        const manualAdjustmentCheckbox = document.getElementById('manualAdjustment');
+        const contractMonthsInput = document.getElementById('contractMonths');
+        
+        // Renewal quote elements
+        const currentContractInput = document.getElementById('currentContract');
+        const currentDiscountInput = document.getElementById('current-discount');
+        const renewalIncreaseInput = document.getElementById('renewal-increase');
+        const manualRenewalAdjustmentCheckbox = document.getElementById('manualRenewalAdjustment');
+        const clientNameInput = document.getElementById('clientName');
+        const accountManagerInput = document.getElementById('accountManager');
+        
+        // Quote view buttons
+        const viewQuoteBtn = document.getElementById('viewQuoteBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const printBtn = document.getElementById('printBtn');
+        const backBtn = document.getElementById('backBtn');
+        
+        // App container and quote view
+        const appContainer = document.getElementById('appContainer');
+        const quoteView = document.getElementById('quoteView');
+
+        // Navigation between steps
+        function showStep(stepNumber) {
+            // Hide all step content
+            step1Content.classList.remove('active');
+            step2Content.classList.remove('active');
+            step3Content.classList.remove('active');
+            step4Content.classList.remove('active');
+            
+            // Remove active class from all steps
+            step1.classList.remove('active');
+            step2.classList.remove('active');
+            step3.classList.remove('active');
+            step4.classList.remove('active');
+            
+            // Show the selected step content and mark step as active
+            if (stepNumber === 1) {
+                step1Content.classList.add('active');
+                step1.classList.add('active');
+            } else if (stepNumber === 2) {
+                step2Content.classList.add('active');
+                step2.classList.add('active');
+            } else if (stepNumber === 3) {
+                step3Content.classList.add('active');
+                step3.classList.add('active');
+            } else if (stepNumber === 4) {
+                step4Content.classList.add('active');
+                step4.classList.add('active');
+            }
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
+
+        // Format percentage
+        function formatPercentage(value) {
+            return value.toFixed(2) + '%';
+        }
+
+        // Add a new product
+        function addProduct(name, quantity, listPrice, discount) {
+            const product = {
+                id: nextId++,
+                name: name || 'New Product',
+                quantity: quantity || 1,
+                listPrice: listPrice || 0,
+                discount: discount || 0,
+                salesPrice: calculateSalesPrice(listPrice || 0, discount || 0)
+            };
+            products.push(product);
+            renderProducts();
+        }
+
+        // Calculate sales price based on list price and discount
+        function calculateSalesPrice(listPrice, discount) {
+            return listPrice * (1 - (discount / 100));
+        }
+
+        // Remove a product
+        function removeProduct(id) {
+            products = products.filter(p => p.id !== id);
+            renderProducts();
+        }
+
+        // Update a product property
+        function updateProduct(id, property, value) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            
+            product[property] = value;
+            
+            // Update related properties
+            if (property === 'discount') {
+                product.salesPrice = calculateSalesPrice(product.listPrice, product.discount);
+            } else if (property === 'salesPrice') {
+                if (product.listPrice > 0) {
+                    product.discount = ((product.listPrice - product.salesPrice) / product.listPrice) * 100;
+                    // Cap discount at 99.99%
+                    product.discount = Math.min(99.99, product.discount);
+                } else {
+                    product.discount = 0;
+                }
+            } else if (property === 'listPrice') {
+                product.salesPrice = calculateSalesPrice(product.listPrice, product.discount);
+            }
+            
+            renderProducts();
+        }
+
+        // Reset products to initial state
+        function resetProducts() {
+            products = [];
+            nextId = 1;
+            addProduct('ActivTrak Professional', 160, 19.00, 23.95);
+            addProduct('Premier Support', 160, 1.50, 50.00);
+            addProduct('Screen Details', 160, 2.00, 50.00);
+        }
+
+        // Render all products
+        function renderProducts() {
+            const tbody = document.getElementById('product-rows');
+            tbody.innerHTML = '';
+            
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                
+                // Product name
+                const nameCell = document.createElement('td');
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.value = product.name;
+                nameInput.style.width = '150px';
+                nameInput.addEventListener('change', function() {
+                    updateProduct(product.id, 'name', this.value);
+                });
+                nameCell.appendChild(nameInput);
+                
+                // Quantity
+                const quantityCell = document.createElement('td');
+                quantityCell.className = 'text-right';
+                const quantityInput = document.createElement('input');
+                quantityInput.type = 'number';
+                quantityInput.value = product.quantity;
+                quantityInput.min = '1';
+                quantityInput.style.width = '80px';
+                quantityInput.addEventListener('change', function() {
+                    updateProduct(product.id, 'quantity', parseInt(this.value) || 1);
+                });
+                quantityCell.appendChild(quantityInput);
+                
+                // List price
+                const listPriceCell = document.createElement('td');
+                listPriceCell.className = 'text-right';
+                const listPriceInput = document.createElement('input');
+                listPriceInput.type = 'number';
+                listPriceInput.value = product.listPrice.toFixed(2);
+                listPriceInput.min = '0';
+                listPriceInput.step = '0.01';
+                listPriceInput.style.width = '80px';
+                listPriceInput.addEventListener('change', function() {
+                    updateProduct(product.id, 'listPrice', parseFloat(this.value) || 0);
+                });
+                listPriceCell.appendChild(listPriceInput);
+                
+                // Total list value
+                const totalListCell = document.createElement('td');
+                totalListCell.className = 'text-right';
+                totalListCell.textContent = (product.quantity * product.listPrice).toFixed(2);
+                
+                // Discount
+                const discountCell = document.createElement('td');
+                discountCell.className = 'text-right';
+                const discountInput = document.createElement('input');
+                discountInput.type = 'number';
+                discountInput.value = product.discount.toFixed(2);
+                discountInput.min = '0';
+                discountInput.max = '99.99';
+                discountInput.step = '0.01';
+                discountInput.style.width = '80px';
+                discountInput.addEventListener('change', function() {
+                    updateProduct(product.id, 'discount', parseFloat(this.value) || 0);
+                });
+                discountCell.appendChild(discountInput);
+                
+                // Sales price
+                const salesPriceCell = document.createElement('td');
+                salesPriceCell.className = 'text-right';
+                const salesPriceInput = document.createElement('input');
+                salesPriceInput.type = 'number';
+                salesPriceInput.value = product.salesPrice.toFixed(2);
+                salesPriceInput.min = '0';
+                salesPriceInput.step = '0.01';
+                salesPriceInput.style.width = '80px';
+                salesPriceInput.addEventListener('change', function() {
+                    updateProduct(product.id, 'salesPrice', parseFloat(this.value) || 0);
+                });
+                salesPriceCell.appendChild(salesPriceInput);
+                
+                // Total sales value
+                const totalSalesCell = document.createElement('td');
+                totalSalesCell.className = 'text-right';
+                totalSalesCell.textContent = (product.quantity * product.salesPrice).toFixed(2);
+                
+                // Actions
+                const actionsCell = document.createElement('td');
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.className = 'btn-danger';
+                removeButton.addEventListener('click', function() {
+                    removeProduct(product.id);
+                });
+                actionsCell.appendChild(removeButton);
+                
+                // Add all cells to the row
+                row.appendChild(nameCell);
+                row.appendChild(quantityCell);
+                row.appendChild(listPriceCell);
+                row.appendChild(totalListCell);
+                row.appendChild(discountCell);
+                row.appendChild(salesPriceCell);
+                row.appendChild(totalSalesCell);
+                row.appendChild(actionsCell);
+                
+                // Add row to table
+                tbody.appendChild(row);
+            });
+            
+            updateTotals();
+            updateSummary();
+        }
+
+        // Update totals
+        function updateTotals() {
+            let totalListValue = 0;
+            let totalSalesValue = 0;
+            let listPriceSum = 0;
+            let salesPriceSum = 0;
+            
+            products.forEach(product => {
+                totalListValue += product.quantity * product.listPrice;
+                totalSalesValue += product.quantity * product.salesPrice;
+                listPriceSum += product.listPrice;
+                salesPriceSum += product.salesPrice;
+            });
+            
+            const overallDiscount = totalListValue > 0 ? 
+                ((totalListValue - totalSalesValue) / totalListValue) * 100 : 0;
+            
+            document.getElementById('list-price-sum').textContent = listPriceSum.toFixed(2);
+            document.getElementById('sales-price-sum').value = salesPriceSum.toFixed(2);
+            document.getElementById('total-list-value').textContent = totalListValue.toFixed(2);
+            document.getElementById('total-sales-value').textContent = totalSalesValue.toFixed(2);
+            document.getElementById('overall-discount').textContent = overallDiscount.toFixed(2) + '%';
+            
+            // Update summary discount
+            document.getElementById('summary-list-value').textContent = formatCurrency(totalListValue);
+            document.getElementById('summary-sales-value').textContent = formatCurrency(totalSalesValue);
+            document.getElementById('summary-savings').textContent = formatCurrency(totalListValue - totalSalesValue);
+            document.getElementById('summary-discount').textContent = formatPercentage(overallDiscount);
+            
+            // Update renewal values
+            calculateRenewalOptions(totalSalesValue);
+        }
+
+        // Update summary section
+        function updateSummary() {
+            let totalListValue = 0;
+            let totalSalesValue = 0;
+            
+            products.forEach(product => {
+                totalListValue += product.quantity * product.listPrice;
+                totalSalesValue += product.quantity * product.salesPrice;
+            });
+            
+            const overallDiscount = totalListValue > 0 ? 
+                ((totalListValue - totalSalesValue) / totalListValue) * 100 : 0;
+            const savings = totalListValue - totalSalesValue;
+            
+            contractMonths = parseInt(contractMonthsInput.value) || 12;
+            
+            document.getElementById('monthly-list-value').textContent = formatCurrency(totalListValue);
+            document.getElementById('monthly-sales-value').textContent = formatCurrency(totalSalesValue);
+            document.getElementById('monthly-savings').textContent = formatCurrency(savings);
+            document.getElementById('monthly-discount').textContent = formatPercentage(overallDiscount) + ' discount';
+            
+            document.getElementById('contract-list-value').textContent = formatCurrency(totalListValue * contractMonths);
+            document.getElementById('contract-sales-value').textContent = formatCurrency(totalSalesValue * contractMonths);
+            document.getElementById('contract-savings').textContent = formatCurrency(savings * contractMonths);
+            
+            // Set the current contract value based on the calculated sales value
+            if (products.length > 0) {
+                document.getElementById('currentContract').value = (totalSalesValue * contractMonths).toFixed(2);
+            }
+        }
+
+        // Apply target discount methods
+        function applyTargetDiscount() {
+            const method = document.getElementById('distribution-method').value;
+            targetDiscount = parseFloat(document.getElementById('target-discount').value) || 30;
+            
+            if (method === 'equal') {
+                applyEqualDiscount();
+            } else if (method === 'priority') {
+                applyPriorityDiscount();
+            } else {
+                applyProportionalDiscount();
+            }
+        }
+
+        // Apply equal discount to all products
+        function applyEqualDiscount() {
+            products.forEach(product => {
+                updateProduct(product.id, 'discount', targetDiscount);
+            });
+        }
+
+        // Apply proportional discount
+        function applyProportionalDiscount() {
+            // Calculate current overall discount
+            let totalListValue = 0;
+            let totalSalesValue = 0;
+            
+            products.forEach(product => {
+                totalListValue += product.quantity * product.listPrice;
+                totalSalesValue += product.quantity * product.salesPrice;
+            });
+            
+            const currentDiscount = totalListValue > 0 ? 
+                ((totalListValue - totalSalesValue) / totalListValue) * 100 : 0;
+            
+            if (currentDiscount === 0) {
+                applyEqualDiscount();
+                return;
+            }
+            
+            // Apply proportional adjustment
+            const factor = targetDiscount / currentDiscount;
+            
+            products.forEach(product => {
+                const newDiscount = Math.min(99.99, product.discount * factor);
+                updateProduct(product.id, 'discount', newDiscount);
+            });
+        }
+
+        // Apply priority-based discount
+        function applyPriorityDiscount() {
+            // Sort products by total list value (highest first)
+            const sortedProducts = [...products].sort((a, b) => {
+                return (b.quantity * b.listPrice) - (a.quantity * a.listPrice);
+            });
+            
+            // Calculate current and target values
+            let totalListValue = 0;
+            products.forEach(product => {
+                totalListValue += product.quantity * product.listPrice;
+            });
+            
+            const targetSalesValue = totalListValue * (1 - targetDiscount / 100);
+            let currentSalesValue = 0;
+            
+            products.forEach(product => {
+                currentSalesValue += product.quantity * product.salesPrice;
+            });
+            
+            // Adjust discounts in priority order
+            for (const product of sortedProducts) {
+                const productValue = product.quantity * product.listPrice;
+                
+                if (Math.abs(currentSalesValue - targetSalesValue) < 0.01) {
+                    break;
+                }
+                
+                if (currentSalesValue > targetSalesValue) {
+                    // Need to increase discount
+                    const additionalDiscountNeeded = (currentSalesValue - targetSalesValue) / productValue * 100;
+                    const newDiscount = Math.min(99.99, product.discount + additionalDiscountNeeded);
+                    const oldSalesValue = product.quantity * product.salesPrice;
+                    
+                    updateProduct(product.id, 'discount', newDiscount);
+                    const newSalesValue = product.quantity * product.salesPrice;
+                    currentSalesValue = currentSalesValue - (oldSalesValue - newSalesValue);
+                } else {
+                    // Need to decrease discount
+                    const discountReduction = (targetSalesValue - currentSalesValue) / productValue * 100;
+                    const newDiscount = Math.max(0, product.discount - discountReduction);
+                    const oldSalesValue = product.quantity * product.salesPrice;
+                    
+                    updateProduct(product.id, 'discount', newDiscount);
+                    const newSalesValue = product.quantity * product.salesPrice;
+                    currentSalesValue = currentSalesValue + (newSalesValue - oldSalesValue);
+                }
+            }
+        }
+
+        // Calculate renewal options based on total contract sales value
+        function calculateRenewalOptions(monthlySalesValue) {
+            // Get current contract value and discount
+            const currentContract = parseFloat(currentContractInput.value) || 10000;
+            const currentDiscount = parseFloat(currentDiscountInput.value) || 25;
+            
+            // Determine the increase percentage based on discount level
+            let increasePercentage = 0;
+            if (currentDiscount >= 40) {
+                increasePercentage = 20;
+            } else if (currentDiscount >= 20 && currentDiscount <= 39) {
+                increasePercentage = 15;
+            } else if (currentDiscount > 0 && currentDiscount < 20) {
+                increasePercentage = 10;
+            }
+            
+            renewalIncreaseInput.value = increasePercentage;
+            
+            // Calculate the new base amount with increase
+            const contractMonths = parseInt(contractMonthsInput.value) || 12;
+            const totalSalesValue = monthlySalesValue * contractMonths;
+            const newBaseAmount = totalSalesValue > 0 ? totalSalesValue : currentContract * (1 + (increasePercentage / 100));
+            
+            // Calculate term prices
+            if (!manualRenewalAdjustmentCheckbox.checked) {
+                term12Price = newBaseAmount;
+                term24Price = newBaseAmount * 0.95 * 2; // 5% discount for 2 years
+                term36Price = newBaseAmount * 0.90 * 3; // 10% discount for 3 years
+            }
+            
+            // Update the term price displays
+            updateRenewalDisplay();
+            
+            // Update summary display
+            document.getElementById('summaryCurrentAmount').textContent = formatCurrency(currentContract);
+            document.getElementById('summaryNewAmount').textContent = formatCurrency(newBaseAmount);
+            document.getElementById('summaryIncrease').textContent = increasePercentage;
+        }
+
+        // Update renewal price display
+        function updateRenewalDisplay() {
+            if (manualRenewalAdjustmentCheckbox.checked) {
+                // Create input elements for manual entry
+                document.getElementById('term12Cell').innerHTML = `<input type="number" value="${term12Price.toFixed(2)}" style="width: 120px; text-align: right;" id="term12Input">`;
+                document.getElementById('term24Cell').innerHTML = `<input type="number" value="${term24Price.toFixed(2)}" style="width: 120px; text-align: right;" id="term24Input">`;
+                document.getElementById('term36Cell').innerHTML = `<input type="number" value="${term36Price.toFixed(2)}" style="width: 120px; text-align: right;" id="term36Input">`;
+                
+                // Add event listeners to the new inputs
+                document.getElementById('term12Input').addEventListener('change', function() {
+                    term12Price = parseFloat(this.value) || term12Price;
+                    updateRenewalAnnualDisplay();
+                });
+                
+                document.getElementById('term24Input').addEventListener('change', function() {
+                    term24Price = parseFloat(this.value) || term24Price;
+                    updateRenewalAnnualDisplay();
+                });
+                
+                document.getElementById('term36Input').addEventListener('change', function() {
+                    term36Price = parseFloat(this.value) || term36Price;
+                    updateRenewalAnnualDisplay();
+                });
+            } else {
+                // Display formatted currency
+                document.getElementById('term12Cell').textContent = formatCurrency(term12Price);
+                document.getElementById('term24Cell').textContent = formatCurrency(term24Price);
+                document.getElementById('term36Cell').textContent = formatCurrency(term36Price);
+            }
+            
+            updateRenewalAnnualDisplay();
+        }
+
+        // Update the annual prices in the renewal display
+        function updateRenewalAnnualDisplay() {
+            document.getElementById('term12Annual').textContent = formatCurrency(term12Price);
+            document.getElementById('term24Annual').textContent = formatCurrency(term24Price / 2);
+            document.getElementById('term36Annual').textContent = formatCurrency(term36Price / 3);
+            
+            // Calculate savings vs current
+            const currentContract = parseFloat(currentContractInput.value) || 10000;
+            document.getElementById('term12Savings').textContent = formatCurrency(currentContract - term12Price);
+            document.getElementById('term24Savings').textContent = formatCurrency((currentContract * 2) - term24Price);
+            document.getElementById('term36Savings').textContent = formatCurrency((currentContract * 3) - term36Price);
+        }
+
+        // Update quote view
+        function updateQuoteView() {
+            const clientName = clientNameInput.value;
+            const accountManager = accountManagerInput.value;
+            
+            // Update client info section
+            document.getElementById('clientInfo').style.display = clientName ? 'block' : 'none';
+            document.getElementById('clientNameDisplay').textContent = clientName || '-';
+            document.getElementById('accountManagerDisplay').textContent = accountManager || '-';
+            document.getElementById('contactPerson').textContent = accountManager || 'your Customer Success Manager';
+            
+            // Update pricing
+            document.getElementById('quote12Price').textContent = formatCurrency(term12Price);
+            document.getElementById('quote24Price').textContent = formatCurrency(term24Price);
+            document.getElementById('quote36Price').textContent = formatCurrency(term36Price);
+            document.getElementById('quote12Annual').textContent = formatCurrency(term12Price) + ' per year';
+            document.getElementById('quote24Annual').textContent = formatCurrency(term24Price / 2) + ' per year';
+            document.getElementById('quote36Annual').textContent = formatCurrency(term36Price / 3) + ' per year';
+        }
+
+        // Reset the form
+        function resetForm() {
+            clientNameInput.value = '';
+            accountManagerInput.value = '';
+            contractMonthsInput.value = '12';
+            currentContractInput.value = '10000';
+            currentDiscountInput.value = '25';
+            targetDiscountInput.value = '30';
+            distributionMethodSelect.value = 'proportional';
+            manualAdjustmentCheckbox.checked = false;
+            manualRenewalAdjustmentCheckbox.checked = false;
+            
+            resetProducts();
+            showStep(1);
+        }
+
+        // Event Listeners for Step Navigation
+        nextToStep2.addEventListener('click', function() {
+            showStep(2);
+        });
+        
+        backToStep1.addEventListener('click', function() {
+            showStep(1);
+        });
+        
+        nextToStep3.addEventListener('click', function() {
+            showStep(3);
+        });
+        
+        backToStep2.addEventListener('click', function() {
+            showStep(2);
+        });
+        
+        nextToStep4.addEventListener('click', function() {
+            showStep(4);
+        });
+        
+        backToStep3.addEventListener('click', function() {
+            showStep(3);
+        });
+
+        // Product-related event listeners
+        addProductBtn.addEventListener('click', function() {
+            addProduct();
+        });
+        
+        resetProductsBtn.addEventListener('click', resetProducts);
+        
+        applyTargetDiscountBtn.addEventListener('click', applyTargetDiscount);
+        
+        contractMonthsInput.addEventListener('change', function() {
+            contractMonths = parseInt(this.value) || 12;
+            updateSummary();
+        });
+        
+        // Manual adjustment event listeners
+        manualAdjustmentCheckbox.addEventListener('change', renderProducts);
+        
+        manualRenewalAdjustmentCheckbox.addEventListener('change', function() {
+            updateRenewalDisplay();
+        });
+        
+        // Quote view event listeners
+        viewQuoteBtn.addEventListener('click', function() {
+            updateQuoteView();
+            appContainer.style.display = 'none';
+            quoteView.style.display = 'block';
+        });
+        
+        resetBtn.addEventListener('click', resetForm);
+        
+        printBtn.addEventListener('click', function() {
+            window.print();
+        });
+        
+        backBtn.addEventListener('click', function() {
+            quoteView.style.display = 'none';
+            appContainer.style.display = 'block';
+        });
+        
+        // Initialize the application
+        resetProducts();
+    </script>
+</body>
+</html>
