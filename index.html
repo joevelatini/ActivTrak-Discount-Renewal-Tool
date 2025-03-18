@@ -401,7 +401,9 @@
                             <td class="text-right"><span id="list-price-sum">0.00</span></td>
                             <td class="text-right"><span id="total-list-value">0.00</span></td>
                             <td class="text-right"><span id="overall-discount">0.00%</span></td>
-                            <td class="text-right"><span id="sales-price-sum">0.00</span></td>
+                            <td class="text-right">
+                                <input type="number" id="sales-price-sum" min="0" step="0.01" value="0.00">
+                            </td>
                             <td class="text-right"><span id="total-sales-value">0.00</span></td>
                             <td></td>
                         </tr>
@@ -428,7 +430,9 @@
                         </div>
                         <div class="summary-box">
                             <div class="summary-label">Total Contract Sales Value</div>
-                            <div class="summary-value" id="contract-sales-value">$0.00</div>
+                            <div class="summary-value" id="contract-sales-value">
+                                <input type="number" id="contract-sales-value-input" min="0" step="0.01" value="0.00" style="width: 150px; text-align: right;">
+                            </div>
                         </div>
                         <div class="summary-box">
                             <div class="summary-label">Total Contract Savings</div>
@@ -846,7 +850,7 @@
                 ((totalListValue - totalSalesValue) / totalListValue) * 100 : 0;
             
             document.getElementById('list-price-sum').textContent = listPriceSum.toFixed(2);
-            document.getElementById('sales-price-sum').textContent = salesPriceSum.toFixed(2);
+            document.getElementById('sales-price-sum').value = salesPriceSum.toFixed(2);
             document.getElementById('total-list-value').textContent = totalListValue.toFixed(2);
             document.getElementById('total-sales-value').textContent = totalSalesValue.toFixed(2);
             document.getElementById('overall-discount').textContent = overallDiscount.toFixed(2) + '%';
@@ -879,7 +883,7 @@
             const totalContractSalesValue = totalSalesValue * contractMonths;
             
             document.getElementById('contract-list-value').textContent = formatCurrency(totalListValue * contractMonths);
-            document.getElementById('contract-sales-value').textContent = formatCurrency(totalContractSalesValue);
+            document.getElementById('contract-sales-value-input').value = totalContractSalesValue.toFixed(2);
             document.getElementById('contract-savings').textContent = formatCurrency(savings * contractMonths);
             
             // Set the current contract value based on the calculated sales value
@@ -1191,7 +1195,54 @@
             appContainer.style.display = 'block';
         });
         
-        // No longer needed since sales-price-sum is now a span, not an input
+        // Step through sales price sum changes
+        document.getElementById('sales-price-sum').addEventListener('change', function() {
+            const newSalesPriceSum = parseFloat(this.value) || 0;
+            let currentSalesPriceSum = 0;
+            
+            // Calculate current sales price sum
+            products.forEach(product => {
+                currentSalesPriceSum += product.salesPrice;
+            });
+            
+            if (currentSalesPriceSum > 0 && products.length > 0) {
+                // Calculate ratio to adjust all prices
+                const ratio = newSalesPriceSum / currentSalesPriceSum;
+                
+                // Update all product sales prices proportionally
+                products.forEach(product => {
+                    const newSalesPrice = product.salesPrice * ratio;
+                    updateProduct(product.id, 'salesPrice', newSalesPrice);
+                });
+            }
+        });
+        
+        // Handle changes to the contract sales value
+        document.getElementById('contract-sales-value-input').addEventListener('change', function() {
+            const newContractSalesValue = parseFloat(this.value) || 0;
+            const contractMonths = parseInt(contractMonthsInput.value) || 12;
+            
+            // Calculate the new monthly sales value
+            const newMonthlySalesValue = newContractSalesValue / contractMonths;
+            
+            let currentMonthlySalesValue = 0;
+            
+            // Calculate current monthly sales value
+            products.forEach(product => {
+                currentMonthlySalesValue += product.quantity * product.salesPrice;
+            });
+            
+            if (currentMonthlySalesValue > 0 && products.length > 0) {
+                // Calculate ratio to adjust all prices
+                const ratio = newMonthlySalesValue / currentMonthlySalesValue;
+                
+                // Update all product sales prices proportionally
+                products.forEach(product => {
+                    const newSalesPrice = product.salesPrice * ratio;
+                    updateProduct(product.id, 'salesPrice', newSalesPrice);
+                });
+            }
+        });
         
         // Initialize the application
         resetProducts();
