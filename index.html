@@ -460,18 +460,6 @@
                             <input type="number" id="renewal-increase" value="15" min="0" max="100" step="1" disabled>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><strong>Increase Calculation Rules:</strong></label>
-                            <ul style="font-size: 0.9em; padding-left: 20px; margin-top: 5px;">
-                                <li>0% discount: 0% increase</li>
-                                <li>1-9% discount: Matching percentage (1% → 1%, etc.)</li>
-                                <li>10-19% discount: 10% increase</li>
-                                <li>20-39% discount: 15% increase</li>
-                                <li>40%+ discount: 20% increase</li>
-                            </ul>
-                        </div>
-                    </div>
                     <label class="manual-adjust checkbox-label">
                         <input type="checkbox" id="manualRenewalAdjustment">
                         <span>Enable manual renewal price adjustments</span>
@@ -1010,13 +998,14 @@
         function calculateRenewalOptions(monthlySalesValue) {
             // Get current contract value and discount
             const currentContract = parseFloat(currentContractInput.value) || 10000;
-            const currentDiscount = parseFloat(currentDiscountInput.value) || 25;
+            const currentDiscount = parseFloat(currentDiscountInput.value) || 0;
             
             // Determine the increase percentage based on discount level
             let increasePercentage = 0;
             
             // Apply the exact mapping specified
             if (currentDiscount === 0) {
+                // Explicitly set to 0% increase when discount is 0%
                 increasePercentage = 0;
             } else if (currentDiscount >= 1 && currentDiscount <= 9) {
                 // Exact matching percentage (1% discount → 1% increase, etc.)
@@ -1029,6 +1018,7 @@
                 increasePercentage = 20;
             }
             
+            // Force update the renewal increase input to show the correct value
             renewalIncreaseInput.value = increasePercentage;
             
             // Calculate the new base amount with increase
@@ -1171,7 +1161,9 @@
             calculateRenewalOptions();
         });
         
+        // Event listener for current discount changes
         currentDiscountInput.addEventListener('change', function() {
+            // Immediately recalculate the renewal options when discount changes
             calculateRenewalOptions();
         });
         
