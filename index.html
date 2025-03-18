@@ -338,9 +338,8 @@
         <!-- Step Indicator -->
         <div class="step-indicator">
             <div class="step-item active" data-step="1">Step 1: Client Information</div>
-            <div class="step-item" data-step="2">Step 2: Apply Discounts</div>
-            <div class="step-item" data-step="3">Step 3: Configure Products</div>
-            <div class="step-item" data-step="4">Step 4: Renewal Options</div>
+            <div class="step-item" data-step="2">Step 2: Configure Products</div>
+            <div class="step-item" data-step="3">Step 3: Renewal Options</div>
         </div>
 
         <!-- Main Application Container -->
@@ -373,57 +372,8 @@
                 </div>
             </div>
 
-            <!-- Step 2: Apply Discounts -->
+            <!-- Step 2: Configure Products -->
             <div class="step-content" id="step2Content">
-                <h2>Apply Discounts</h2>
-                <div class="settings-panel">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="target-discount">Target Discount (%)</label>
-                            <input type="number" id="target-discount" min="0" max="99.99" step="0.01" value="30">
-                        </div>
-                        <div class="form-group">
-                            <label for="distribution-method">Distribution Method</label>
-                            <select id="distribution-method">
-                                <option value="proportional">Proportional</option>
-                                <option value="priority">Priority (Highest First)</option>
-                                <option value="equal">Equal</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="button-group">
-                        <button id="apply-target-discount" class="btn-primary">Apply Target Discount</button>
-                    </div>
-                </div>
-                <div class="summary">
-                    <h3>Discount Summary</h3>
-                    <div class="summary-grid">
-                        <div class="summary-box">
-                            <div class="summary-label">Original List Value</div>
-                            <div class="summary-value" id="summary-list-value">$0.00</div>
-                        </div>
-                        <div class="summary-box">
-                            <div class="summary-label">Discounted Sales Value</div>
-                            <div class="summary-value" id="summary-sales-value">$0.00</div>
-                        </div>
-                        <div class="summary-box">
-                            <div class="summary-label">Total Savings</div>
-                            <div class="summary-value" id="summary-savings">$0.00</div>
-                        </div>
-                        <div class="summary-box">
-                            <div class="summary-label">Effective Discount</div>
-                            <div class="summary-value" id="summary-discount">0.00%</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="button-group">
-                    <button class="btn-secondary" onclick="showStep(1)">Back to Step 1</button>
-                    <button class="btn-primary" onclick="showStep(3)">Continue to Step 3</button>
-                </div>
-            </div>
-
-            <!-- Step 3: Configure Products -->
-            <div class="step-content" id="step3Content">
                 <h2>Configure Products</h2>
                 <div class="settings-panel">
                     <button id="add-product" class="btn-success">Add Product</button>
@@ -451,9 +401,7 @@
                             <td class="text-right"><span id="list-price-sum">0.00</span></td>
                             <td class="text-right"><span id="total-list-value">0.00</span></td>
                             <td class="text-right"><span id="overall-discount">0.00%</span></td>
-                            <td class="text-right">
-                                <input type="number" id="sales-price-sum" min="0" step="0.01" value="0.00">
-                            </td>
+                            <td class="text-right"><span id="sales-price-sum">0.00</span></td>
                             <td class="text-right"><span id="total-sales-value">0.00</span></td>
                             <td></td>
                         </tr>
@@ -489,13 +437,13 @@
                     </div>
                 </div>
                 <div class="button-group">
-                    <button class="btn-secondary" onclick="showStep(2)">Back to Step 2</button>
-                    <button class="btn-primary" onclick="showStep(4)">Continue to Step 4</button>
+                    <button class="btn-secondary" onclick="showStep(1)">Back to Step 1</button>
+                    <button class="btn-primary" onclick="showStep(3)">Continue to Step 3</button>
                 </div>
             </div>
 
-            <!-- Step 4: Generate Renewal Options -->
-            <div class="step-content" id="step4Content">
+            <!-- Step 3: Generate Renewal Options -->
+            <div class="step-content" id="step3Content">
                 <h2>Renewal Options</h2>
                 <div class="settings-panel">
                     <div class="form-row">
@@ -550,7 +498,7 @@
                     </tbody>
                 </table>
                 <div class="button-group">
-                    <button class="btn-secondary" onclick="showStep(3)">Back to Step 3</button>
+                    <button class="btn-secondary" onclick="showStep(2)">Back to Step 2</button>
                     <button id="viewQuoteBtn" class="btn-primary">View Client-Ready Quote</button>
                     <button id="resetBtn" class="btn-danger">Reset Form</button>
                 </div>
@@ -638,12 +586,9 @@
         const stepItems = document.querySelectorAll('.step-item');
         const stepContents = document.querySelectorAll('.step-content');
         
-        // Discount calculator elements
+        // Product configuration elements
         const addProductBtn = document.getElementById('add-product');
         const resetProductsBtn = document.getElementById('reset-products');
-        const targetDiscountInput = document.getElementById('target-discount');
-        const distributionMethodSelect = document.getElementById('distribution-method');
-        const applyTargetDiscountBtn = document.getElementById('apply-target-discount');
         const contractMonthsInput = document.getElementById('contractMonths');
         
         // Renewal quote elements
@@ -688,8 +633,8 @@
             
             document.getElementById(`step${stepNumber}Content`).classList.add('active');
             
-            // Ensure calculations are up to date when switching to step 4
-            if (stepNumber === 4) {
+            // Ensure calculations are up to date when switching to step 3 (renewal options)
+            if (stepNumber === 3) {
                 calculateRenewalOptions();
             }
         }
@@ -754,6 +699,8 @@
                 }
             } else if (property === 'listPrice') {
                 product.salesPrice = calculateSalesPrice(product.listPrice, product.discount);
+            } else if (property === 'quantity') {
+                // No need to update any calculated values, but we need to update totals
             }
             
             renderProducts();
@@ -899,16 +846,13 @@
                 ((totalListValue - totalSalesValue) / totalListValue) * 100 : 0;
             
             document.getElementById('list-price-sum').textContent = listPriceSum.toFixed(2);
-            document.getElementById('sales-price-sum').value = salesPriceSum.toFixed(2);
+            document.getElementById('sales-price-sum').textContent = salesPriceSum.toFixed(2);
             document.getElementById('total-list-value').textContent = totalListValue.toFixed(2);
             document.getElementById('total-sales-value').textContent = totalSalesValue.toFixed(2);
             document.getElementById('overall-discount').textContent = overallDiscount.toFixed(2) + '%';
             
-            // Update summary discount
-            document.getElementById('summary-list-value').textContent = formatCurrency(totalListValue);
-            document.getElementById('summary-sales-value').textContent = formatCurrency(totalSalesValue);
-            document.getElementById('summary-savings').textContent = formatCurrency(totalListValue - totalSalesValue);
-            document.getElementById('summary-discount').textContent = formatPercentage(overallDiscount);
+            // Calculate renewal options based on the updated values
+            calculateRenewalOptions(totalSalesValue);
         }
 
         // Update summary section
@@ -1191,8 +1135,6 @@
             contractMonthsInput.value = '12';
             currentContractInput.value = '10000';
             currentDiscountInput.value = '25';
-            targetDiscountInput.value = '30';
-            distributionMethodSelect.value = 'proportional';
             manualRenewalAdjustmentCheckbox.checked = false;
             
             resetProducts();
@@ -1213,8 +1155,6 @@
         });
         
         resetProductsBtn.addEventListener('click', resetProducts);
-        
-        applyTargetDiscountBtn.addEventListener('click', applyTargetDiscount);
         
         contractMonthsInput.addEventListener('change', function() {
             contractMonths = parseInt(this.value) || 12;
@@ -1251,21 +1191,7 @@
             appContainer.style.display = 'block';
         });
         
-        // Step through sales price sum changes
-        document.getElementById('sales-price-sum').addEventListener('change', function() {
-            const salesPriceSum = parseFloat(this.value) || 0;
-            const totalListValue = parseFloat(document.getElementById('total-list-value').textContent) || 0;
-            
-            if (totalListValue > 0 && products.length > 0) {
-                // Calculate the overall discount percentage
-                const overallDiscount = ((totalListValue - salesPriceSum) / totalListValue) * 100;
-                
-                // Apply equal discount to achieve the overall target
-                products.forEach(product => {
-                    updateProduct(product.id, 'discount', overallDiscount);
-                });
-            }
-        });
+        // No longer needed since sales-price-sum is now a span, not an input
         
         // Initialize the application
         resetProducts();
