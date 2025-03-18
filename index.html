@@ -323,13 +323,7 @@
         
         <h1>ActivTrak Discount & Renewal Tool</h1>
         
-        <!-- Step Indicator -->
-        <div class="steps no-print">
-            <div class="step active" id="step1">1. Client Information</div>
-            <div class="step" id="step2">2. Configure Products</div>
-            <div class="step" id="step3">3. Apply Discounts</div>
-            <div class="step" id="step4">4. Generate Renewal Options</div>
-        </div>
+        <!-- Main content begins here -->
 
         <!-- Main Application Container -->
         <div id="appContainer">
@@ -361,8 +355,57 @@
                 </div>
             </div>
 
-            <!-- Step 2: Configure Products -->
+            <!-- Step 2: Apply Discounts -->
             <div class="step-content" id="step2Content">
+                <h2>Apply Discounts</h2>
+                <div class="settings-panel">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="target-discount">Target Discount (%)</label>
+                            <input type="number" id="target-discount" min="0" max="99.99" step="0.01" value="30">
+                        </div>
+                        <div class="form-group">
+                            <label for="distribution-method">Distribution Method</label>
+                            <select id="distribution-method">
+                                <option value="proportional">Proportional</option>
+                                <option value="priority">Priority (Highest First)</option>
+                                <option value="equal">Equal</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button id="apply-target-discount" class="btn-primary">Apply Target Discount</button>
+                    </div>
+                </div>
+                <div class="summary">
+                    <h3>Discount Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-box">
+                            <div class="summary-label">Original List Value</div>
+                            <div class="summary-value" id="summary-list-value">$0.00</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-label">Discounted Sales Value</div>
+                            <div class="summary-value" id="summary-sales-value">$0.00</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-label">Total Savings</div>
+                            <div class="summary-value" id="summary-savings">$0.00</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-label">Effective Discount</div>
+                            <div class="summary-value" id="summary-discount">0.00%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-secondary" id="backToStep1">Back</button>
+                    <button class="btn-primary" id="nextToStep3">Next: Configure Products</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Configure Products -->
+            <div class="step-content" id="step3Content">
                 <h2>Configure Products</h2>
                 <div class="settings-panel">
                     <button id="add-product" class="btn-success">Add Product</button>
@@ -424,59 +467,6 @@
                         <div class="summary-box">
                             <div class="summary-label">Total Contract Savings</div>
                             <div class="summary-value" id="contract-savings">$0.00</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="button-group">
-                    <button class="btn-secondary" id="backToStep1">Back</button>
-                    <button class="btn-primary" id="nextToStep3">Next: Apply Discounts</button>
-                </div>
-            </div>
-
-            <!-- Step 3: Apply Discounts -->
-            <div class="step-content" id="step3Content">
-                <h2>Apply Discounts</h2>
-                <div class="settings-panel">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="target-discount">Target Discount (%)</label>
-                            <input type="number" id="target-discount" min="0" max="99.99" step="0.01" value="30">
-                        </div>
-                        <div class="form-group">
-                            <label for="distribution-method">Distribution Method</label>
-                            <select id="distribution-method">
-                                <option value="proportional">Proportional</option>
-                                <option value="priority">Priority (Highest First)</option>
-                                <option value="equal">Equal</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="button-group">
-                        <button id="apply-target-discount" class="btn-primary">Apply Target Discount</button>
-                    </div>
-                </div>
-                <label class="manual-adjust checkbox-label">
-                    <input type="checkbox" id="manualAdjustment">
-                    <span>Enable manual price adjustments</span>
-                </label>
-                <div class="summary">
-                    <h3>Discount Summary</h3>
-                    <div class="summary-grid">
-                        <div class="summary-box">
-                            <div class="summary-label">Original List Value</div>
-                            <div class="summary-value" id="summary-list-value">$0.00</div>
-                        </div>
-                        <div class="summary-box">
-                            <div class="summary-label">Discounted Sales Value</div>
-                            <div class="summary-value" id="summary-sales-value">$0.00</div>
-                        </div>
-                        <div class="summary-box">
-                            <div class="summary-label">Total Savings</div>
-                            <div class="summary-value" id="summary-savings">$0.00</div>
-                        </div>
-                        <div class="summary-box">
-                            <div class="summary-label">Effective Discount</div>
-                            <div class="summary-value" id="summary-discount">0.00%</div>
                         </div>
                     </div>
                 </div>
@@ -650,7 +640,7 @@
         const targetDiscountInput = document.getElementById('target-discount');
         const distributionMethodSelect = document.getElementById('distribution-method');
         const applyTargetDiscountBtn = document.getElementById('apply-target-discount');
-        const manualAdjustmentCheckbox = document.getElementById('manualAdjustment');
+        // Manual adjustment is only for renewal options
         const contractMonthsInput = document.getElementById('contractMonths');
         
         // Renewal quote elements
@@ -679,25 +669,15 @@
             step3Content.classList.remove('active');
             step4Content.classList.remove('active');
             
-            // Remove active class from all steps
-            step1.classList.remove('active');
-            step2.classList.remove('active');
-            step3.classList.remove('active');
-            step4.classList.remove('active');
-            
-            // Show the selected step content and mark step as active
+            // Show the selected step content
             if (stepNumber === 1) {
                 step1Content.classList.add('active');
-                step1.classList.add('active');
             } else if (stepNumber === 2) {
                 step2Content.classList.add('active');
-                step2.classList.add('active');
             } else if (stepNumber === 3) {
                 step3Content.classList.add('active');
-                step3.classList.add('active');
             } else if (stepNumber === 4) {
                 step4Content.classList.add('active');
-                step4.classList.add('active');
             }
         }
 
@@ -1165,7 +1145,6 @@
             currentDiscountInput.value = '25';
             targetDiscountInput.value = '30';
             distributionMethodSelect.value = 'proportional';
-            manualAdjustmentCheckbox.checked = false;
             manualRenewalAdjustmentCheckbox.checked = false;
             
             resetProducts();
@@ -1211,9 +1190,7 @@
             updateSummary();
         });
         
-        // Manual adjustment event listeners
-        manualAdjustmentCheckbox.addEventListener('change', renderProducts);
-        
+        // Manual adjustment event listener for renewal options
         manualRenewalAdjustmentCheckbox.addEventListener('change', function() {
             updateRenewalDisplay();
         });
