@@ -260,37 +260,47 @@
         }
         
         /* Step indicator */
-        .steps {
+        .step-indicator {
             display: flex;
-            margin-bottom: 30px;
-            overflow: auto;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
         }
         
-        .step {
-            padding: 10px 20px;
-            background-color: #f0f0f0;
+        .step-item {
+            flex: 1;
+            padding: 12px 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #666;
             position: relative;
-            margin-right: 20px;
-            white-space: nowrap;
+            border-right: 1px solid #ddd;
         }
         
-        .step::after {
-            content: '';
-            position: absolute;
-            right: -10px;
-            top: 0;
-            border-top: 20px solid transparent;
-            border-bottom: 20px solid transparent;
-            border-left: 10px solid #f0f0f0;
+        .step-item:last-child {
+            border-right: none;
         }
         
-        .step.active {
+        .step-item.active {
             background-color: var(--primary-color);
             color: white;
         }
         
-        .step.active::after {
-            border-left-color: var(--primary-color);
+        .step-item.completed {
+            background-color: #e9f0f8;
+            color: var(--primary-color);
+        }
+        
+        .step-content {
+            display: none;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+        }
+        
+        .step-content.active {
+            display: block;
         }
         
         /* Print styles */
@@ -325,6 +335,14 @@
         
         <!-- Main content begins here -->
 
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step-item active" data-step="1">Step 1: Client Information</div>
+            <div class="step-item" data-step="2">Step 2: Apply Discounts</div>
+            <div class="step-item" data-step="3">Step 3: Configure Products</div>
+            <div class="step-item" data-step="4">Step 4: Renewal Options</div>
+        </div>
+
         <!-- Main Application Container -->
         <div id="appContainer">
             <!-- Step 1: Client Information -->
@@ -349,6 +367,9 @@
                         <label for="currentContract">Current Contract Amount ($)</label>
                         <input type="number" id="currentContract" value="10000">
                     </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="showStep(2)">Continue to Step 2</button>
                 </div>
             </div>
 
@@ -396,8 +417,8 @@
                     </div>
                 </div>
                 <div class="button-group">
-                    <button class="btn-secondary" id="backToStep1">Back</button>
-                    <button class="btn-primary" id="nextToStep3">Next: Configure Products</button>
+                    <button class="btn-secondary" onclick="showStep(1)">Back to Step 1</button>
+                    <button class="btn-primary" onclick="showStep(3)">Continue to Step 3</button>
                 </div>
             </div>
 
@@ -467,6 +488,10 @@
                         </div>
                     </div>
                 </div>
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="showStep(2)">Back to Step 2</button>
+                    <button class="btn-primary" onclick="showStep(4)">Continue to Step 4</button>
+                </div>
             </div>
 
             <!-- Step 4: Generate Renewal Options -->
@@ -525,6 +550,7 @@
                     </tbody>
                 </table>
                 <div class="button-group">
+                    <button class="btn-secondary" onclick="showStep(3)">Back to Step 3</button>
                     <button id="viewQuoteBtn" class="btn-primary">View Client-Ready Quote</button>
                     <button id="resetBtn" class="btn-danger">Reset Form</button>
                 </div>
@@ -606,12 +632,11 @@
         let term12Price = 0;
         let term24Price = 0;
         let term36Price = 0;
+        let currentStep = 1;
 
         // DOM Elements
-        const step1Content = document.getElementById('step1Content');
-        const step2Content = document.getElementById('step2Content');
-        const step3Content = document.getElementById('step3Content');
-        const step4Content = document.getElementById('step4Content');
+        const stepItems = document.querySelectorAll('.step-item');
+        const stepContents = document.querySelectorAll('.step-content');
         
         // Discount calculator elements
         const addProductBtn = document.getElementById('add-product');
@@ -619,7 +644,6 @@
         const targetDiscountInput = document.getElementById('target-discount');
         const distributionMethodSelect = document.getElementById('distribution-method');
         const applyTargetDiscountBtn = document.getElementById('apply-target-discount');
-        // Manual adjustment is only for renewal options
         const contractMonthsInput = document.getElementById('contractMonths');
         
         // Renewal quote elements
@@ -639,6 +663,36 @@
         // App container and quote view
         const appContainer = document.getElementById('appContainer');
         const quoteView = document.getElementById('quoteView');
+
+        // Function to show a specific step
+        function showStep(stepNumber) {
+            // Update current step
+            currentStep = stepNumber;
+            
+            // Update step indicators
+            stepItems.forEach(item => {
+                const itemStep = parseInt(item.getAttribute('data-step'));
+                item.classList.remove('active', 'completed');
+                
+                if (itemStep === stepNumber) {
+                    item.classList.add('active');
+                } else if (itemStep < stepNumber) {
+                    item.classList.add('completed');
+                }
+            });
+            
+            // Show only the current step content
+            stepContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.getElementById(`step${stepNumber}Content`).classList.add('active');
+            
+            // Ensure calculations are up to date when switching to step 4
+            if (stepNumber === 4) {
+                calculateRenewalOptions();
+            }
+        }
 
         // Format currency
         function formatCurrency(amount) {
@@ -855,9 +909,6 @@
             document.getElementById('summary-sales-value').textContent = formatCurrency(totalSalesValue);
             document.getElementById('summary-savings').textContent = formatCurrency(totalListValue - totalSalesValue);
             document.getElementById('summary-discount').textContent = formatPercentage(overallDiscount);
-            
-            // Update renewal values
-            calculateRenewalOptions(totalSalesValue);
         }
 
         // Update summary section
@@ -888,7 +939,7 @@
             document.getElementById('contract-savings').textContent = formatCurrency(savings * contractMonths);
             
             // Set the current contract value based on the calculated sales value
-            if (products.length > 0) {
+            if (products.length > 0 && totalContractSalesValue > 0) {
                 document.getElementById('currentContract').value = totalContractSalesValue.toFixed(2);
             }
             
@@ -1014,9 +1065,25 @@
             renewalIncreaseInput.value = increasePercentage;
             
             // Calculate the new base amount with increase
-            const contractMonths = parseInt(contractMonthsInput.value) || 12;
-            const totalSalesValue = monthlySalesValue * contractMonths;
-            const newBaseAmount = totalSalesValue > 0 ? totalSalesValue : currentContract * (1 + (increasePercentage / 100));
+            contractMonths = parseInt(contractMonthsInput.value) || 12;
+            
+            // If monthlySalesValue is not provided or is 0, use the current contract value
+            let totalSalesValue = 0;
+            if (monthlySalesValue && monthlySalesValue > 0) {
+                totalSalesValue = monthlySalesValue * contractMonths;
+            } else {
+                // Find the total sales value from products
+                products.forEach(product => {
+                    totalSalesValue += product.quantity * product.salesPrice * contractMonths;
+                });
+                
+                // If still 0, use current contract value
+                if (totalSalesValue === 0) {
+                    totalSalesValue = currentContract;
+                }
+            }
+            
+            const newBaseAmount = totalSalesValue * (1 + (increasePercentage / 100));
             
             // Calculate term prices
             if (!manualRenewalAdjustmentCheckbox.checked) {
@@ -1075,9 +1142,23 @@
             
             // Calculate savings vs current
             const currentContract = parseFloat(currentContractInput.value) || 10000;
-            document.getElementById('term12Savings').textContent = formatCurrency(currentContract - term12Price);
-            document.getElementById('term24Savings').textContent = formatCurrency((currentContract * 2) - term24Price);
-            document.getElementById('term36Savings').textContent = formatCurrency((currentContract * 3) - term36Price);
+            
+            // Calculate savings (could be negative if the new price is higher)
+            const savings12 = currentContract - term12Price;
+            const savings24 = (currentContract * 2) - term24Price;
+            const savings36 = (currentContract * 3) - term36Price;
+            
+            document.getElementById('term12Savings').textContent = formatCurrency(savings12);
+            document.getElementById('term24Savings').textContent = formatCurrency(savings24);
+            document.getElementById('term36Savings').textContent = formatCurrency(savings36);
+            
+            // Update the quote view prices
+            document.getElementById('quote12Price').textContent = formatCurrency(term12Price);
+            document.getElementById('quote24Price').textContent = formatCurrency(term24Price);
+            document.getElementById('quote36Price').textContent = formatCurrency(term36Price);
+            document.getElementById('quote12Annual').textContent = formatCurrency(term12Price) + ' per year';
+            document.getElementById('quote24Annual').textContent = formatCurrency(term24Price / 2) + ' per year';
+            document.getElementById('quote36Annual').textContent = formatCurrency(term36Price / 3) + ' per year';
         }
 
         // Update quote view
@@ -1091,13 +1172,16 @@
             document.getElementById('accountManagerDisplay').textContent = accountManager || '-';
             document.getElementById('contactPerson').textContent = accountManager || 'your Customer Success Manager';
             
-            // Update pricing
+            // Update pricing in the quote view
             document.getElementById('quote12Price').textContent = formatCurrency(term12Price);
             document.getElementById('quote24Price').textContent = formatCurrency(term24Price);
             document.getElementById('quote36Price').textContent = formatCurrency(term36Price);
             document.getElementById('quote12Annual').textContent = formatCurrency(term12Price) + ' per year';
             document.getElementById('quote24Annual').textContent = formatCurrency(term24Price / 2) + ' per year';
             document.getElementById('quote36Annual').textContent = formatCurrency(term36Price / 3) + ' per year';
+            
+            appContainer.style.display = 'none';
+            quoteView.style.display = 'block';
         }
 
         // Reset the form
@@ -1115,29 +1199,12 @@
             showStep(1);
         }
 
-        // Event Listeners for Step Navigation
-        nextToStep2.addEventListener('click', function() {
-            showStep(2);
-        });
-        
-        backToStep1.addEventListener('click', function() {
-            showStep(1);
-        });
-        
-        nextToStep3.addEventListener('click', function() {
-            showStep(3);
-        });
-        
-        backToStep2.addEventListener('click', function() {
-            showStep(2);
-        });
-        
-        nextToStep4.addEventListener('click', function() {
-            showStep(4);
-        });
-        
-        backToStep3.addEventListener('click', function() {
-            showStep(3);
+        // Make the step items clickable
+        stepItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const stepNumber = parseInt(this.getAttribute('data-step'));
+                showStep(stepNumber);
+            });
         });
 
         // Product-related event listeners
@@ -1154,16 +1221,23 @@
             updateSummary();
         });
         
+        currentContractInput.addEventListener('change', function() {
+            calculateRenewalOptions();
+        });
+        
+        currentDiscountInput.addEventListener('change', function() {
+            calculateRenewalOptions();
+        });
+        
         // Manual adjustment event listener for renewal options
         manualRenewalAdjustmentCheckbox.addEventListener('change', function() {
+            renewalIncreaseInput.disabled = !this.checked;
             updateRenewalDisplay();
         });
         
         // Quote view event listeners
         viewQuoteBtn.addEventListener('click', function() {
             updateQuoteView();
-            appContainer.style.display = 'none';
-            quoteView.style.display = 'block';
         });
         
         resetBtn.addEventListener('click', resetForm);
@@ -1177,14 +1251,27 @@
             appContainer.style.display = 'block';
         });
         
+        // Step through sales price sum changes
+        document.getElementById('sales-price-sum').addEventListener('change', function() {
+            const salesPriceSum = parseFloat(this.value) || 0;
+            const totalListValue = parseFloat(document.getElementById('total-list-value').textContent) || 0;
+            
+            if (totalListValue > 0 && products.length > 0) {
+                // Calculate the overall discount percentage
+                const overallDiscount = ((totalListValue - salesPriceSum) / totalListValue) * 100;
+                
+                // Apply equal discount to achieve the overall target
+                products.forEach(product => {
+                    updateProduct(product.id, 'discount', overallDiscount);
+                });
+            }
+        });
+        
         // Initialize the application
         resetProducts();
         
-        // Make all sections visible by default
-        step1Content.classList.add('active');
-        step2Content.classList.add('active');
-        step3Content.classList.add('active');
-        step4Content.classList.add('active');
+        // Make only Step 1 visible initially
+        showStep(1);
     </script>
 </body>
 </html>
