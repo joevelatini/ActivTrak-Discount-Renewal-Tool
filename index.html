@@ -350,9 +350,6 @@
                         <input type="number" id="currentContract" value="10000">
                     </div>
                 </div>
-                <div class="button-group">
-                    <button class="btn-primary" id="nextToStep2">Next: Configure Products</button>
-                </div>
             </div>
 
             <!-- Step 2: Apply Discounts -->
@@ -470,10 +467,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="button-group">
-                    <button class="btn-secondary" id="backToStep2">Back</button>
-                    <button class="btn-primary" id="nextToStep4">Next: Generate Renewal Options</button>
-                </div>
             </div>
 
             <!-- Step 4: Generate Renewal Options -->
@@ -532,7 +525,6 @@
                     </tbody>
                 </table>
                 <div class="button-group">
-                    <button class="btn-secondary" id="backToStep3">Back</button>
                     <button id="viewQuoteBtn" class="btn-primary">View Client-Ready Quote</button>
                     <button id="resetBtn" class="btn-danger">Reset Form</button>
                 </div>
@@ -615,24 +607,11 @@
         let term24Price = 0;
         let term36Price = 0;
 
-        // DOM Elements for steps
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-        const step3 = document.getElementById('step3');
-        const step4 = document.getElementById('step4');
-        
+        // DOM Elements
         const step1Content = document.getElementById('step1Content');
         const step2Content = document.getElementById('step2Content');
         const step3Content = document.getElementById('step3Content');
         const step4Content = document.getElementById('step4Content');
-        
-        // Step navigation buttons
-        const nextToStep2 = document.getElementById('nextToStep2');
-        const backToStep1 = document.getElementById('backToStep1');
-        const nextToStep3 = document.getElementById('nextToStep3');
-        const backToStep2 = document.getElementById('backToStep2');
-        const nextToStep4 = document.getElementById('nextToStep4');
-        const backToStep3 = document.getElementById('backToStep3');
         
         // Discount calculator elements
         const addProductBtn = document.getElementById('add-product');
@@ -660,26 +639,6 @@
         // App container and quote view
         const appContainer = document.getElementById('appContainer');
         const quoteView = document.getElementById('quoteView');
-
-        // Navigation between steps
-        function showStep(stepNumber) {
-            // Hide all step content
-            step1Content.classList.remove('active');
-            step2Content.classList.remove('active');
-            step3Content.classList.remove('active');
-            step4Content.classList.remove('active');
-            
-            // Show the selected step content
-            if (stepNumber === 1) {
-                step1Content.classList.add('active');
-            } else if (stepNumber === 2) {
-                step2Content.classList.add('active');
-            } else if (stepNumber === 3) {
-                step3Content.classList.add('active');
-            } else if (stepNumber === 4) {
-                step4Content.classList.add('active');
-            }
-        }
 
         // Format currency
         function formatCurrency(amount) {
@@ -922,14 +881,19 @@
             document.getElementById('monthly-savings').textContent = formatCurrency(savings);
             document.getElementById('monthly-discount').textContent = formatPercentage(overallDiscount) + ' discount';
             
+            const totalContractSalesValue = totalSalesValue * contractMonths;
+            
             document.getElementById('contract-list-value').textContent = formatCurrency(totalListValue * contractMonths);
-            document.getElementById('contract-sales-value').textContent = formatCurrency(totalSalesValue * contractMonths);
+            document.getElementById('contract-sales-value').textContent = formatCurrency(totalContractSalesValue);
             document.getElementById('contract-savings').textContent = formatCurrency(savings * contractMonths);
             
             // Set the current contract value based on the calculated sales value
             if (products.length > 0) {
-                document.getElementById('currentContract').value = (totalSalesValue * contractMonths).toFixed(2);
+                document.getElementById('currentContract').value = totalContractSalesValue.toFixed(2);
             }
+            
+            // Update renewal values
+            calculateRenewalOptions(totalSalesValue);
         }
 
         // Apply target discount methods
@@ -1215,6 +1179,12 @@
         
         // Initialize the application
         resetProducts();
+        
+        // Make all sections visible by default
+        step1Content.classList.add('active');
+        step2Content.classList.add('active');
+        step3Content.classList.add('active');
+        step4Content.classList.add('active');
     </script>
 </body>
 </html>
