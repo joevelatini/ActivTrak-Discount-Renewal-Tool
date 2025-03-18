@@ -453,11 +453,23 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="current-discount">Current Discount (%)</label>
-                            <input type="number" id="current-discount" value="25">
+                            <input type="number" id="current-discount" value="25" min="0" max="100" step="1">
                         </div>
                         <div class="form-group">
                             <label for="renewal-increase">Applied Increase (%)</label>
-                            <input type="number" id="renewal-increase" value="15" disabled>
+                            <input type="number" id="renewal-increase" value="15" min="0" max="100" step="1" disabled>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><strong>Increase Calculation Rules:</strong></label>
+                            <ul style="font-size: 0.9em; padding-left: 20px; margin-top: 5px;">
+                                <li>0% discount: 0% increase</li>
+                                <li>1-9% discount: Matching percentage (1% → 1%, etc.)</li>
+                                <li>10-19% discount: 10% increase</li>
+                                <li>20-39% discount: 15% increase</li>
+                                <li>40%+ discount: 20% increase</li>
+                            </ul>
                         </div>
                     </div>
                     <label class="manual-adjust checkbox-label">
@@ -1002,42 +1014,32 @@
             
             // Determine the increase percentage based on discount level
             let increasePercentage = 0;
-            if (currentDiscount >= 40) {
-                increasePercentage = 20;
+            
+            // Apply the exact mapping specified
+            if (currentDiscount === 0) {
+                increasePercentage = 0;
+            } else if (currentDiscount >= 1 && currentDiscount <= 9) {
+                // Exact matching percentage (1% discount → 1% increase, etc.)
+                increasePercentage = currentDiscount;
+            } else if (currentDiscount >= 10 && currentDiscount <= 19) {
+                increasePercentage = 10;
             } else if (currentDiscount >= 20 && currentDiscount <= 39) {
                 increasePercentage = 15;
-            } else if (currentDiscount > 0 && currentDiscount < 20) {
-                increasePercentage = 10;
+            } else if (currentDiscount >= 40) {
+                increasePercentage = 20;
             }
             
             renewalIncreaseInput.value = increasePercentage;
             
             // Calculate the new base amount with increase
-            contractMonths = parseInt(contractMonthsInput.value) || 12;
-            
-            // If monthlySalesValue is not provided or is 0, use the current contract value
-            let totalSalesValue = 0;
-            if (monthlySalesValue && monthlySalesValue > 0) {
-                totalSalesValue = monthlySalesValue * contractMonths;
-            } else {
-                // Find the total sales value from products
-                products.forEach(product => {
-                    totalSalesValue += product.quantity * product.salesPrice * contractMonths;
-                });
-                
-                // If still 0, use current contract value
-                if (totalSalesValue === 0) {
-                    totalSalesValue = currentContract;
-                }
-            }
-            
-            const newBaseAmount = totalSalesValue * (1 + (increasePercentage / 100));
+            const newBaseAmount = currentContract * (1 + (increasePercentage / 100));
             
             // Calculate term prices
             if (!manualRenewalAdjustmentCheckbox.checked) {
-                term12Price = newBaseAmount;
-                term24Price = newBaseAmount * 0.95 * 2; // 5% discount for 2 years
-                term36Price = newBaseAmount * 0.90 * 3; // 10% discount for 3 years
+                // Apply term-based discounts to the new base amount
+                term12Price = newBaseAmount;                        // 100% of new base amount
+                term24Price = newBaseAmount * 0.95 * 2;             // 95% per year × 2 years
+                term36Price = newBaseAmount * 0.90 * 3;             // 90% per year × 3 years
             }
             
             // Update the term price displays
@@ -1176,6 +1178,31 @@
         // Manual adjustment event listener for renewal options
         manualRenewalAdjustmentCheckbox.addEventListener('change', function() {
             renewalIncreaseInput.disabled = !this.checked;
+            
+            if (this.checked) {
+                // If enabling manual adjustments, allow the user to edit the increase percentage
+                renewalIncreaseInput.addEventListener('change', function() {
+                    const currentContract = parseFloat(currentContractInput.value) || 10000;
+                    const manualIncrease = parseFloat(this.value) || 0;
+                    
+                    // Calculate the new base amount with the manual increase
+                    const newBaseAmount = currentContract * (1 + (manualIncrease / 100));
+                    
+                    // Update term prices
+                    term12Price = newBaseAmount;                       // 100% of new base amount
+                    term24Price = newBaseAmount * 0.95 * 2;            // 95% per year × 2 years
+                    term36Price = newBaseAmount * 0.90 * 3;            // 90% per year × 3 years
+                    
+                    // Update displays
+                    updateRenewalDisplay();
+                    document.getElementById('summaryNewAmount').textContent = formatCurrency(newBaseAmount);
+                    document.getElementById('summaryIncrease').textContent = manualIncrease;
+                });
+            } else {
+                // If disabling manual adjustments, recalculate based on current discount
+                calculateRenewalOptions();
+            }
+            
             updateRenewalDisplay();
         });
         
